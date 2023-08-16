@@ -58,6 +58,41 @@ function Autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
   return adjDescriptor;
 }
 
+// ProjectList Class
+class ProjectList {
+  templateElement: HTMLTemplateElement;
+  hostElement: HTMLDivElement;
+  element: HTMLElement;
+
+  constructor(private type: "active" | "finished") {
+    this.templateElement = document.getElementById(
+      "project-list"
+    )! as HTMLTemplateElement;
+    this.hostElement = document.getElementById("app")! as HTMLDivElement;
+
+    const importedHTMLContent = document.importNode(
+      this.templateElement.content,
+      true
+    );
+
+    this.element = importedHTMLContent.firstElementChild as HTMLElement;
+    this.element.id = `${this.type}-projects`;
+    this.atached();
+    this.renderContent();
+  }
+
+  private renderContent() {
+    const listId = `${this.type}-project-list`;
+    this.element.querySelector("ul")!.id = listId;
+    this.element.querySelector("h2")!.textContent =
+      this.type.toUpperCase() + " Projects";
+  }
+
+  private atached() {
+    this.hostElement.insertAdjacentElement("beforeend", this.element);
+  }
+}
+
 // ProjectInput Class
 class ProjectInput {
   templateElement: HTMLTemplateElement;
@@ -68,23 +103,19 @@ class ProjectInput {
   peopleInputElement: HTMLInputElement;
 
   constructor() {
-    // We are getting access to the HTML elements
     this.templateElement = document.getElementById(
       "project-input"
     )! as HTMLTemplateElement;
     this.hostElement = document.getElementById("app")! as HTMLDivElement;
 
-    // import the content of "project-input" element and render to the dom
     const importedHTMLContent = document.importNode(
       this.templateElement.content,
       true
     );
 
-    // form element
     this.element = importedHTMLContent.firstElementChild as HTMLFormElement;
     this.element.id = "user-input";
 
-    // single form elements
     this.titleInputElement = this.element.querySelector(
       "#title"
     ) as HTMLInputElement;
@@ -95,9 +126,7 @@ class ProjectInput {
       "#people"
     ) as HTMLInputElement;
 
-    // configure form - submit
     this.configure();
-    // render the content
     this.attach();
   }
 
@@ -146,22 +175,21 @@ class ProjectInput {
     }
   }
 
-  // Clear inputs
   private clearInputs() {
     this.titleInputElement.value = "";
     this.descriptionInputElement.value = "";
     this.peopleInputElement.value = "";
   }
 
-  // set up an even listener
   private configure() {
     this.element.addEventListener("submit", this.submitHandler);
   }
 
-  // function that render the content
   private attach() {
     this.hostElement.insertAdjacentElement("afterbegin", this.element);
   }
 }
 
 const projectInput = new ProjectInput();
+const activeProjects = new ProjectList("active");
+const finishedProjects = new ProjectList("finished");
